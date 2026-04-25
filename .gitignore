@@ -1,0 +1,29 @@
+# Dependency
+**/node_modules/
+backend/vendor/
+
+# Environment Variables (Sangat Penting!)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Expo & Mobile specific
+frontend/.expo/
+frontend/android/build/
+frontend/ios/build/
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# Abaikan folder dependencies (WAJIB)
+**/node_modules/
+**/vendor/
+
+# Abaikan environment variables
+**/.env
+**/.env.local
+
+# Abaikan folder khusus mobile/build
+frontend/.expo/
+backend/storage/*.log
