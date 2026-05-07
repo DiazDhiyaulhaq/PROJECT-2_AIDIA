@@ -2,19 +2,22 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import AuthNavigator from './AuthNavigator';
 import TabNavigator from './TabNavigator';
+import { useAuthStore } from '../store/useAuthStore';
+import GlucoseScreen from '../screens/home/GlucoseScreen';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
-  const isLoggedIn = true; // Nanti diganti dengan status login asli dari backend
+  const token = useAuthStore((state: any) => state.token);
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {isLoggedIn ? (
-        // Jika sudah login, langsung ke Tab Utama
-        <Stack.Screen name="Main" component={TabNavigator} />
+      {token ? (
+        <>
+          <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen name="GlucoseDetail" component={GlucoseScreen} />
+        </>
       ) : (
-        // Jika belum, ke layar Login/Register
         <Stack.Screen name="Auth" component={AuthNavigator} />
       )}
     </Stack.Navigator>

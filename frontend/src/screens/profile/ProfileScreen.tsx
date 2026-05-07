@@ -1,142 +1,54 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
-import { Ionicons, Feather } from '@expo/vector-icons';
-import { COLORS } from '../../utils/colors';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export default function ProfileScreen() {
+  const { user, logout } = useAuthStore();
+
+  const handleSignOut = () => {
+    logout(); // Ini bakal otomatis pindahin kamu ke layar Login
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        
-        {/* HEADER SECTION (Avatar & Name) */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <View style={styles.profileInfo}>
-            <View style={styles.avatarCircle}>
-              <Ionicons name="person-outline" size={40} color="#fff" />
-            </View>
-            <Text style={styles.userName}>Lil Amba</Text>
-            <Text style={styles.userEmail}>lilamba@email.com</Text>
-          </View>
+      <Text style={styles.headerTitle}>Menu Profile</Text>
+
+      <View style={styles.content}>
+        {/* User Info */}
+        <View style={styles.userInfoRow}>
+          <View style={styles.avatarCircle} />
+          <Text style={styles.userName}>{user?.name || 'Lil Amba'}</Text>
         </View>
 
-        <View style={styles.content}>
-          {/* MENU CARD */}
-          <View style={styles.menuCard}>
-            <MenuItem 
-              icon="target" 
-              label="My Goals" 
-              iconColor={COLORS.primary} 
-              onPress={() => {}} 
-            />
-            <MenuItem 
-              icon="trash-2" 
-              label="Delete Account" 
-              iconColor="#FF5C5C" 
-              isLast 
-              onPress={() => {}} 
-            />
-            <MenuItem 
-              icon="log-out" 
-              label="Sign out" 
-              iconColor="#4B5563" 
-              isLast 
-              onPress={() => {}} 
-            />
-          </View>
+        {/* Menu Items */}
+        <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuText}>My Goals</Text>
+          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        </TouchableOpacity>
 
-          {/* STATISTICS SECTION */}
-          <View style={styles.statsCard}>
-            <Text style={styles.sectionTitle}>Account Statistics</Text>
-            <View style={styles.statsRow}>
-              <StatItem value="42" label="Days Active" />
-              <StatItem value="156" label="Logs Recorded" />
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+        <TouchableOpacity style={styles.menuItem}>
+          <Text style={styles.menuText}>Delete Account</Text>
+          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        </TouchableOpacity>
 
-      {/* FLOATING CHAT BUTTON */}
-      <TouchableOpacity style={styles.fab}>
-        <Ionicons name="chatbubble-outline" size={24} color="#fff" />
-      </TouchableOpacity>
+        {/* Sign Out Button */}
+        <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
+          <Text style={styles.menuText}>Sign out</Text>
+          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
-// Sub-komponen untuk Baris Menu
-const MenuItem = ({ icon, label, iconColor, isLast, onPress }: any) => (
-  <TouchableOpacity 
-    style={[styles.menuItem, !isLast && styles.menuBorder]} 
-    onPress={onPress}
-  >
-    <View style={styles.menuLeft}>
-      <Feather name={icon} size={20} color={iconColor} />
-      <Text style={[styles.menuLabel, { color: iconColor === '#FF5C5C' ? '#FF5C5C' : COLORS.textDark }]}>
-        {label}
-      </Text>
-    </View>
-    <Feather name="chevron-right" size={18} color="#D1D5DB" />
-  </TouchableOpacity>
-);
-
-// Sub-komponen untuk Statistik
-const StatItem = ({ value, label }: { value: string; label: string }) => (
-  <View style={styles.statBox}>
-    <Text style={styles.statValue}>{value}</Text>
-    <Text style={styles.statLabel}>{label}</Text>
-  </View>
-);
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8F9FA' },
-  header: { 
-    backgroundColor: COLORS.primary, 
-    paddingHorizontal: 30, 
-    paddingTop: 50, 
-    paddingBottom: 60,
-    borderBottomLeftRadius: 30, 
-    borderBottomRightRadius: 30,
-    alignItems: 'center'
-  },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff', alignSelf: 'flex-start', marginBottom: 20 },
-  profileInfo: { alignItems: 'center' },
-  avatarCircle: { 
-    width: 90, height: 90, borderRadius: 45, 
-    backgroundColor: 'rgba(255,255,255,0.2)', 
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)'
-  },
-  userName: { fontSize: 22, fontWeight: 'bold', color: '#fff', marginTop: 15 },
-  userEmail: { fontSize: 14, color: '#fff', opacity: 0.8 },
-  content: { paddingHorizontal: 20, marginTop: -30 },
-  menuCard: { 
-    backgroundColor: '#fff', borderRadius: 20, paddingHorizontal: 15, 
-    elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10,
-    marginBottom: 20
-  },
-  menuItem: { 
-    flexDirection: 'row', justifyContent: 'space-between', 
-    alignItems: 'center', paddingVertical: 18 
-  },
-  menuBorder: { borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-  menuLeft: { flexDirection: 'row', alignItems: 'center' },
-  menuLabel: { fontSize: 15, fontWeight: '600', marginLeft: 15 },
-  statsCard: { 
-    backgroundColor: '#fff', borderRadius: 20, padding: 20,
-    elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10
-  },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.textDark, marginBottom: 15 },
-  statsRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  statBox: { 
-    flex: 1, backgroundColor: '#EAF6F4', borderRadius: 15, 
-    paddingVertical: 20, alignItems: 'center', marginHorizontal: 5 
-  },
-  statValue: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary },
-  statLabel: { fontSize: 12, color: COLORS.textGray, marginTop: 4 },
-  fab: { 
-    position: 'absolute', bottom: 100, right: 20, 
-    backgroundColor: COLORS.primary, width: 56, height: 56, borderRadius: 28, 
-    justifyContent: 'center', alignItems: 'center', elevation: 5 
-  }
+  container: { flex: 1, backgroundColor: '#fff', padding: 24 },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#111827', marginBottom: 32 },
+  content: { gap: 8 },
+  userInfoRow: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 32 },
+  avatarCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#E5E7EB' },
+  userName: { fontSize: 18, color: '#111827', fontWeight: '500' },
+  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
+  menuText: { fontSize: 16, color: '#111827' }
 });

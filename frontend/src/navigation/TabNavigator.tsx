@@ -1,12 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../utils/colors';
 
-// Import Screens (Pastikan path sesuai folder kamu)
+// Import Screens (Pastikan path ini sesuai dengan file kamu)
 import HomeScreen from '../screens/home/HomeScreen';
-import NutritionScreen from '../screens/nutrition/NutritionScreen';
-import ReminderScreen from '../screens/reminders/ReminderScreen';
+// import NutritionScreen from '../screens/nutrition/NutritionScreen';
+// import ReminderScreen from '../screens/reminders/ReminderScreen';
+// import ChatbotScreen from '../screens/chatbot/ChatbotScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -16,47 +17,27 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: COLORS.primary, // Warna teal saat aktif
-        tabBarInactiveTintColor: '#9CA3AF',    // Abu-abu saat tidak aktif
-        tabBarStyle: {
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 10,
-          borderTopLeftRadius: 25,
-          borderTopRightRadius: 25,
-          backgroundColor: '#FFFFFF',
-          position: 'absolute', // Membuat efek melayang jika diinginkan
-          borderTopWidth: 0,
-          elevation: 20, // Shadow untuk Android
-          shadowColor: '#000', // Shadow untuk iOS
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.05,
-          shadowRadius: 10,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-        },
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: any;
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarStyle: { height: 70, paddingBottom: 12, paddingTop: 12, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#F3F4F6', elevation: 0 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 4 },
+        tabBarIcon: ({ color, size }) => {
+          let iconName: any = 'home';
+          if (route.name === 'Home') iconName = 'home';
+          else if (route.name === 'Nutrition') iconName = 'coffee';
+          else if (route.name === 'Reminders') iconName = 'bell';
+          else if (route.name === 'Chatbot') iconName = 'message-circle';
+          else if (route.name === 'Profile') iconName = 'user';
 
-          if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Nutrition') {
-            iconName = focused ? 'leaf' : 'leaf-outline';
-          } else if (route.name === 'Reminders') {
-            iconName = focused ? 'notifications' : 'notifications-outline';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-
-          return <Ionicons name={iconName} size={24} color={color} />;
+          return <Feather name={iconName} size={24} color={color} />;
         },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Nutrition" component={NutritionScreen} />
-      <Tab.Screen name="Reminders" component={ReminderScreen} />
+      {/* Uncomment di bawah ini kalau file layarnya sudah siap */}
+      {/* <Tab.Screen name="Nutrition" component={NutritionScreen} /> */}
+      {/* <Tab.Screen name="Reminders" component={ReminderScreen} /> */}
+      {/* <Tab.Screen name="Chatbot" component={ChatbotScreen} /> */}
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

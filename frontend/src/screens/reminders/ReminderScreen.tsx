@@ -1,109 +1,108 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { Ionicons, Feather } from '@expo/vector-icons';
+import { COLORS } from '../../utils/colors';
+import { useNavigation } from '@react-navigation/native';
 
-// Mock Data sesuai struktur database yang kita bahas tadi
-const reminders = [
-  {
-    id: '1',
-    medicine_name: 'Metformin',
-    medicine_type: 'Tablet',
-    dosage: '500mg',
-    time: '08:00',
-    frequency: '2x Sehari',
-    is_taken: false,
-  },
-  {
-    id: '2',
-    medicine_name: 'Glimepiride',
-    medicine_type: 'Kapsul',
-    dosage: '2mg',
-    time: '07:00',
-    frequency: '1x Sehari',
-    is_taken: true,
-  },
+// Data Dummy Jadwal Hari Ini
+const REMINDERS = [
+  { id: '1', title: 'Cek Gula Darah Puasa', time: '07:00 AM', type: 'Checkup', done: true },
+  { id: '2', title: 'Minum Metformin (500mg)', time: '08:00 AM', type: 'Medication', done: false },
+  { id: '3', title: 'Jadwal Makan Siang', time: '12:30 PM', type: 'Nutrition', done: false },
 ];
 
 export default function ReminderScreen() {
-  const renderItem = ({ item }: { item: typeof reminders[0] }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons 
-            name={item.medicine_type === 'Tablet' ? 'pill' : 'medication'} 
-            size={24} 
-            color="#2563eb" 
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.medicineName}>{item.medicine_name}</Text>
-          <Text style={styles.details}>{item.dosage} • {item.frequency}</Text>
-        </View>
-        <View style={styles.timeBadge}>
-          <Text style={styles.timeText}>{item.time}</Text>
-        </View>
-      </View>
-
-      <View style={styles.cardFooter}>
-        <TouchableOpacity 
-          style={[styles.button, item.is_taken ? styles.btnSuccess : styles.btnOutline]}
-        >
-          <Feather 
-            name={item.is_taken ? "check-circle" : "circle"} 
-            size={18} 
-            color={item.is_taken ? "#fff" : "#6b7280"} 
-          />
-          <Text style={[styles.btnText, item.is_taken && styles.textWhite]}>
-            {item.is_taken ? 'Sudah Diminum' : 'Tandai Diminum'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const navigation = useNavigation<any>();
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Pengingat Obat</Text>
-        <Text style={styles.subtitle}>Jangan lupa minum obat tepat waktu ya!</Text>
-      </View>
-
-      <FlatList
-        data={reminders}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Feather name="coffee" size={48} color="#d1d5db" />
-            <Text style={styles.emptyText}>Tidak ada jadwal obat hari ini</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.headerTitle}>Reminders</Text>
+              <Text style={styles.headerSubtitle}>Jadwal kesehatanmu hari ini</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.calendarBtn} 
+              onPress={() => navigation.navigate('Calendar')} // Pindah ke layar Kalender
+            >
+              <Feather name="calendar" size={20} color={COLORS.primary} />
+            </TouchableOpacity>
           </View>
-        }
-      />
+        </View>
+
+        <View style={styles.content}>
+          {/* LIST PENGINGAT */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Hari Ini</Text>
+            
+            {REMINDERS.map((item) => (
+              <View key={item.id} style={[styles.reminderItem, item.done && styles.reminderDone]}>
+                <View style={styles.reminderLeft}>
+                  <TouchableOpacity style={[styles.checkbox, item.done && styles.checkboxActive]}>
+                    {item.done && <Feather name="check" size={14} color="#fff" />}
+                  </TouchableOpacity>
+                  <View>
+                    <Text style={[styles.reminderTitle, item.done && styles.textDone]}>{item.title}</Text>
+                    <Text style={styles.reminderTime}>{item.type} • {item.time}</Text>
+                  </View>
+                </View>
+                <TouchableOpacity>
+                  <Feather name="more-vertical" size={20} color={COLORS.textGray} />
+                </TouchableOpacity>
+              </View>
+            ))}
+
+            <TouchableOpacity style={styles.addBtn}>
+              <Feather name="plus" size={20} color="#fff" />
+              <Text style={styles.addBtnText}>Tambah Pengingat</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  header: { padding: 24, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  title: { fontSize: 28, fontWeight: '800', color: '#111827', letterSpacing: -0.5 },
-  subtitle: { fontSize: 14, color: '#6b7280', marginTop: 4 },
-  listContent: { padding: 16 },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#e5e7eb', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center' },
-  iconContainer: { width: 48, height: 48, borderRadius: 12, backgroundColor: '#eff6ff', justifyContent: 'center', alignItems: 'center' },
-  infoContainer: { flex: 1, marginLeft: 16 },
-  medicineName: { fontSize: 18, fontWeight: '700', color: '#1f2937' },
-  details: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  timeBadge: { paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#f3f4f6', borderRadius: 8 },
-  timeText: { fontSize: 14, fontWeight: '700', color: '#374151' },
-  cardFooter: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  button: { flexDirection: 'row', height: 44, borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 8 },
-  btnOutline: { borderWidth: 1, borderColor: '#d1d5db' },
-  btnSuccess: { backgroundColor: '#16a34a' },
-  btnText: { fontSize: 14, fontWeight: '600', color: '#4b5563' },
-  textWhite: { color: '#fff' },
-  empty: { alignItems: 'center', marginTop: 100 },
-  emptyText: { marginTop: 12, color: '#9ca3af', fontSize: 16 },
+  container: { flex: 1, backgroundColor: '#F8F9FA' },
+  header: { 
+    backgroundColor: COLORS.primary, 
+    padding: 30, paddingTop: 50, paddingBottom: 60,
+    borderBottomLeftRadius: 30, borderBottomRightRadius: 30,
+  },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  headerTitle: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
+  headerSubtitle: { fontSize: 14, color: '#fff', opacity: 0.9, marginTop: 5 },
+  calendarBtn: { backgroundColor: '#fff', padding: 12, borderRadius: 15, elevation: 2 },
+  content: { paddingHorizontal: 20, marginTop: -30 },
+  card: { 
+    backgroundColor: '#fff', borderRadius: 20, padding: 20, 
+    elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10,
+    marginBottom: 100
+  },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.textDark, marginBottom: 15 },
+  reminderItem: { 
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', 
+    backgroundColor: '#F9FAFB', padding: 15, borderRadius: 15, marginBottom: 12,
+    borderWidth: 1, borderColor: '#F3F4F6'
+  },
+  reminderDone: { backgroundColor: '#FDF2F8', borderColor: '#FBCFE8' }, // Efek pink saat selesai
+  reminderLeft: { flexDirection: 'row', alignItems: 'center' },
+  checkbox: { 
+    width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: '#D1D5DB', 
+    marginRight: 12, justifyContent: 'center', alignItems: 'center' 
+  },
+  checkboxActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  reminderTitle: { fontSize: 15, fontWeight: '600', color: COLORS.textDark },
+  textDone: { textDecorationLine: 'line-through', color: COLORS.textGray },
+  reminderTime: { fontSize: 12, color: COLORS.textGray, marginTop: 2 },
+  addBtn: { 
+    backgroundColor: COLORS.primary, flexDirection: 'row', justifyContent: 'center', 
+    alignItems: 'center', paddingVertical: 14, borderRadius: 12, marginTop: 10, gap: 8 
+  },
+  addBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
 });
