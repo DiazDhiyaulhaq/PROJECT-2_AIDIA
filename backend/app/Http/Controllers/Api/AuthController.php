@@ -3,26 +3,158 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+
+use App\Models\User;
+use App\Models\Patient;
+
+use Illuminate\Support\Facades\Hash;
+
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+
+    // 🔥 REGISTER PASIEN
+    public function register(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Login gagal'
-            ], 401);
-        }
+        $request->validate([
 
-        $user = Auth::user(); /** @var \App\Models\User $user */
+            'name' => 'required|string|max:255',
 
-        $token = $user->createToken('mobile')->plainTextToken;
+            'email' => 'required|email|unique:users',
+
+            'password' => 'required|min:6'
+        ]);
+
+        // 🔥 CREATE USER
+        $user = User::create([
+
+            'name' => $request->name,
+
+            'email' => $request->email,
+
+            'password' => Hash::make(
+                $request->password
+            ),
+
+            'role' => 'pasien'
+        ]);
+
+        // 🔥 AUTO CREATE PATIENT
+        Patient::create([
+
+            // dummy nik sementara
+            'nik' =>
+                'P' . time(),
+
+            'name' =>
+                $request->name,
+
+            // default sementara
+            'gender' =>
+                'male',
+
+            'birth_date' =>
+                now(),
+
+            'address' =>
+                '-',
+
+            'phone' =>
+                '-',
+
+            'created_by' =>
+                $user->id
+        ]);
+
+        // 🔥 TOKEN
+        $token = $user
+            ->createToken('mobile')
+            ->plainTextToken;
 
         return response()->json([
-            'user' => $user,
-            'token' => $token
+
+            'message' =>
+                'Register berhasil',
+
+            'user' =>
+                $user,
+
+            'token' =>
+                $token
+        ]);
+    }
+
+
+    // 🔥 LOGIN PASIEN
+    public function login(Request $request)
+    {
+        $request->validate([
+
+            'email' => 'required|email',
+
+            'password' => 'required'
+        ]);
+
+        $user = User::where(
+                'email',
+                $request->email
+            )
+            ->where(
+                'role',
+                'pasien'
+            )
+            ->first();
+
+        if (
+            !$user ||
+            !Hash::check(
+                $request->password,
+                $user->password
+            )
+        ) {
+
+            throw ValidationException
+                ::withMessages([
+
+                'email' => [
+                    'Email atau password salah'
+                ]
+            ]);
+        }
+
+        $token = $user
+            ->createToken('mobile')
+            ->plainTextToken;
+
+        return response()->json([
+
+            'message' =>
+                'Login berhasil',
+
+            'user' =>
+                $user,
+
+            'token' =>
+                $token
+        ]);
+    }
+
+
+    // 🔥 LOGOUT
+    public function logout(Request $request)
+    {
+        $request
+            ->user()
+            ->currentAccessToken()
+            ->delete();
+
+        return response()->json([
+
+            'message' =>
+                'Logout berhasil'
         ]);
     }
 }
